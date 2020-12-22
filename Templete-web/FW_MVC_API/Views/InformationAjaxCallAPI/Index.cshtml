@@ -1,0 +1,339 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    ViewData["Title"] = "DanhSachInformation_Basic";
+}
+
+<h1>DanhSachInformation_Basic</h1>
+
+@(Html.Kendo().Grid<Domain.InformationUserDm.InformationUserDmOutput>()
+    .Name("Grid-Information")
+    .Columns(columns =>
+    {
+        columns.Command(command =>
+        {
+            command.Custom("Sửa AJAX").Click("onEditInfromation");
+            command.Custom("Xóa AJAX").Click("onDeleteInfromation");
+        }).Width(230);
+        columns.Bound(p => p.Id);
+        columns.Bound(p => p.FistName).Width(150).MinScreenWidth(800);
+        columns.Bound(p => p.LastName).Width(180);
+        columns.Bound(p => p.Loai).Width(150).MinScreenWidth(800);
+        columns.Bound(p => p.Kieu).Width(130);
+        columns.Bound(p => p.IsInactive).Width(130);
+        columns.Bound(p => p.DiemSo).Width(130);
+        columns.Bound(p => p.NgaySinh).Width(130);
+        columns.Bound(p => p.CreateBy).Width(130);
+        columns.Bound(p => p.CreateDate).Width(130);
+        columns.Bound(p => p.RowVesion).Width(130);
+
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Custom().Text("Tạo mới POPUP").IconClass("k-icon k-i-plus").Name("button-create-popup");
+        toolbar.Custom().Text("Tạo mới BASIC").IconClass("k-icon k-i-plus").Name("button-create-basic");
+    })
+      .Pageable(p => p.PageSizes(new int[] { 10, 20, 50, 100, 200, 500, 1000 }).ButtonCount(5))
+        .Navigatable()
+        .Sortable()
+        .Filterable()
+        .Scrollable()
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .PageSize(20)
+        .ServerOperation(false)
+        .Events(events => events.Error("error_handler"))
+    )
+)
+
+
+<!-- Large modal -->
+
+<div class="modal fade bd-example-modal-lg" id="createPopup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLongTitle">Tạo mới thông tin</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="col">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="form-group">
+                                <label class="control-label">Tài khoản</label>
+                                @(Html.Kendo().ComboBox()
+                                     .Name("FkAccountObject")
+                                     .DataTextField("UserName")
+                                     .DataValueField("Id")
+                                     .Filter("contains")
+                                     .Placeholder("Chọn tài khoản ...")
+                                     .DataSource(source =>
+                                     {
+                                         source.Read(read =>
+                                         {
+                                             read.Action("ListCombobox_AccountObjectAsyns", "InformationUserBasic");
+                                         })
+                                         .ServerFiltering(false);
+                                     })
+                                     .HtmlAttributes(new { style = "width:100%;" })
+                                )
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Họ</label>
+                                <input id="FistName" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Tên</label>
+                                <input id="LastName" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Loại tài khoản</label>
+                                @(Html.Kendo().ComboBox()
+                                .Name("StypeAccountObject")
+                                .DataTextField("Name")
+                                .DataValueField("Id")
+                                .Filter("contains")
+                                .Placeholder("Chọn loại...")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("ListCombobox_TypeAccountObjectAsyns", "InformationUserBasic");
+                                    })
+                                    .ServerFiltering(false);
+                                })
+                                .HtmlAttributes(new { style = "width:100%;" })
+                                )
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Kiểu tài khoản</label>
+
+                                @(Html.Kendo().ComboBox()
+                                .Name("TypeAccountObject")
+                                .DataTextField("Name")
+                                .DataValueField("Id")
+                                .Filter("contains")
+                                .Placeholder("Chọn kiểu ...")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("ListCombobox_StypeAccountObjectAsyns", "InformationUserBasic");
+                                    })
+                                    .ServerFiltering(false);
+                                })
+                                .HtmlAttributes(new { style = "width:100%;" })
+                                )
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Điểm số</label>
+                                <input type="number" id="DiemSo" class="form-control" />
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="control-label">Ngày sinh</label>
+
+                                @(Html.Kendo().DatePicker()
+                                 .Name("datepicker")
+                                 .Value(DateTime.Now)
+                                 .HtmlAttributes(new { style = "width: 100%", title = "datepicker" })
+                                )
+
+                            </div>
+
+
+                            <div class="form-group">
+                                @(Html.Kendo().Upload()
+                                         .Name("files")
+                                        .Async(a => a
+                                             .Batch(false)
+                                             .Save("Async_Save", "Upload")
+                                             .Remove("Async_Remove", "Upload")
+                                             .AutoUpload(true)
+                                         )
+                                         .Events(events => events
+                                             .Upload("onUpload")
+                                             .Remove("onRemove")
+                                             .Success("onSuccess")
+                                         )
+                                         .Multiple(true)
+                                         .Messages(m => m.Select("Chọn tệp tin"))
+
+                                )
+                            </div>
+                            
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="create-informtionUser" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="EditPopup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLongTitle">Tạo mới thông tin</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="col">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <input id="RowVesion-edit" hidden="hidden" class="form-control" />
+                            <input id="id-edit" hidden="hidden" class="form-control" />
+                            <input id="FkAccountObject-edit" hidden="hidden" class="form-control" />
+                            <div class="form-group">
+                                <label class="control-label">Tài khoản</label>
+                                <input id="AccountName-edit" disabled="disabled" class="form-control" />
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Họ</label>
+                                <input id="FistName-edit" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Tên</label>
+                                <input id="LastName-edit" class="form-control" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Loại tài khoản</label>
+                                @(Html.Kendo().ComboBox()
+                                .Name("StypeAccountObject-edit")
+                                .DataTextField("Name")
+                                .DataValueField("Id")
+                                .Filter("contains")
+                                .Placeholder("Chọn loại...")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("ListCombobox_TypeAccountObjectAsyns", "InformationUserBasic");
+                                    })
+                                    .ServerFiltering(false);
+                                })
+                                .HtmlAttributes(new { style = "width:100%;" })
+                                )
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Kiểu tài khoản</label>
+
+                                @(Html.Kendo().ComboBox()
+                                .Name("TypeAccountObject-edit")
+                                .DataTextField("Name")
+                                .DataValueField("Id")
+                                .Filter("contains")
+                                .Placeholder("Chọn kiểu ...")
+                                .DataSource(source =>
+                                {
+                                    source.Read(read =>
+                                    {
+                                        read.Action("ListCombobox_StypeAccountObjectAsyns", "InformationUserBasic");
+                                    })
+                                    .ServerFiltering(false);
+                                })
+                                .HtmlAttributes(new { style = "width:100%;" })
+                                )
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Điểm số</label>
+                                <input type="number" id="DiemSo-edit" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Ngày sinh</label>
+
+                                @(Html.Kendo().DatePicker()
+                                 .Name("datepicker-edit")
+                                 .Value(DateTime.Now)
+                                 .HtmlAttributes(new { style = "width: 100%", title = "datepicker" })
+                                )
+
+                            </div>
+
+
+                            <div class="form-group">
+                                @(Html.Kendo().Upload()
+                                       .Name("files_edit")
+                                      .Async(a => a
+                                           .Batch(false)
+                                           .Save("Async_SaveEdit", "Upload")
+                                           .Remove("Async_RemoveEdit", "Upload")
+                                           .AutoUpload(true)
+                                       )
+                                       .Events(events => events
+                                           .Upload("onUpload")
+                                           .Remove("onRemove")
+                                           .Success("onSuccess")
+                                       )
+                                       .Multiple(true)
+                                       .Messages(m => m.Select("Chọn tệp tin"))
+
+                                )
+                            </div>
+
+                            <div id="list-file-upload">
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="control-label">Ngừng hoạt dộng</label>
+
+                                @(Html.Kendo().Switch()
+                                     .Name("switchIsInactive-edit")
+                                     .Messages(c => c.Checked("ON").Unchecked("OFF"))
+                                )
+
+                            </div>
+
+                        </div>
+                        </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="Edit-informtionUser" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+
+        <script type="text/javascript">
+            var _url = '@(Config["Url"])';
+        </script>
+        <script src="~/js/InformationAjaxAPI.js"></script>
+}

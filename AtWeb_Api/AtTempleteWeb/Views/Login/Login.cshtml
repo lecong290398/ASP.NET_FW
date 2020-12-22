@@ -1,0 +1,190 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Đăng nhập</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="~/style_login/images/icons/favicon.ico" />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/vendor/bootstrap/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/vendor/animate/animate.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/vendor/css-hamburgers/hamburgers.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/vendor/select2/select2.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/css/util.css">
+    <link rel="stylesheet" type="text/css" href="~/style_login/css/main.css">
+    <!--===============================================================================================-->
+    <link href="~/lib/jquery-confirm-3.3.2/jquery-confirm.min.css" rel="stylesheet" />
+
+
+    <link rel="stylesheet" media="screen" href="~/style/css/style.css">
+</head>
+<body>
+
+    <div class="limiter" id="particles-js">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <div class="login100-pic js-tilt" data-tilt>
+                    <img src="~/style_login/images/img-01.png" alt="IMG">
+                </div>
+
+                <form class="login100-form validate-form">
+
+                    <span class="login100-form-title" style="font-family:Calibri; font-weight:bold ; font-style:italic">
+                        Đăng nhập
+                    </span>
+
+
+                    <div class="wrap-input100 validate-input " data-validate="Chưa nhập Username">
+                        <input class="input100" id="username" placeholder="Username">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-user" aria-hidden="true"></i>
+                        </span>
+
+                    </div>
+
+                    <div class="wrap-input100 validate-input" data-validate="Chưa nhập Password">
+                        <input id="password" class="input100" type="password" placeholder="Password">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-lock" aria-hidden="true"></i>
+                        </span>
+                    </div>
+
+                    <div class="container-login100-form-btn">
+                        <input id="btn-login" type="button" onclick="clickLogin()" value="Đăng nhập" class="login100-form-btn" />
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="~/style/js/particles.js"></script>
+    <script src="~/style/js/app.js"></script>
+
+
+    <!--===============================================================================================-->
+    <script src="~/style_login/vendor/jquery/jquery-3.2.1.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/style_login/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/style_login/vendor/select2/select2.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/style_login/vendor/tilt/tilt.jquery.min.js"></script>
+
+    <script>
+        $('.js-tilt').tilt({
+            scale: 1.1
+        })
+    </script>
+    <!--===============================================================================================-->
+    <script src="~/style_login/js/main.js"></script>
+    <script src="~/lib/jquery-confirm-3.3.2/jquery-confirm.min.js"></script>
+
+
+
+</body>
+</html>
+
+<script>
+    $(document).keypress(function(event){
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if (keycode == '13') {
+            clickLogin();
+        }
+    });
+
+    function clickLogin() {
+
+        var _url = '@(Config["Url"])';
+        var username = $("#username").val();
+        var password = $("#password").val();
+
+        $.ajax({
+            url: _url + "/dang-nhap",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                Username: username,
+                Password: password
+            }),
+            success: function (data) {
+                console.log(data);
+
+                // Truong hop ok co du lieu
+                if (data.IsOk === true) {
+                    if (data.PayLoad != null) {
+
+                        ////Xóa key củ
+                        //window.localStorage.removeItem("key_Token");
+                        //window.localStorage.removeItem("refreshToken");
+
+                        //// tạo key mới
+                        //localStorage.setItem("key_Token", data.PayLoad.accessToken);
+                        //localStorage.setItem("refreshToken", data.PayLoad.refreshToken);
+
+                        var url = '@Url.Action( "Index","Home")';
+
+                        window.location=url;
+                    }
+                }
+                else {
+                    console.log(data.Error);
+                    if (data.Error == 16) {
+                            $.confirm({
+                            icon: 'fa fa-spinner fa-spin',
+                            title: 'Thông báo!',
+                            type: 'red',
+                            typeAnimated: true,
+                            content: 'Đăng nhập thất bại! Username hoặc Password sai !',
+                            buttons: {
+                                tryAgain: {
+                                    text: 'Đóng',
+                                    btnClass: 'btn-red',
+                                    action: function () {
+                                    }
+                                },
+                            }
+                         });
+                    }
+                    else {
+                                 $.confirm({
+                                icon: 'fa fa-spinner fa-spin',
+                                title: 'Thông báo!',
+                                type: 'red',
+                                typeAnimated: true,
+                                content: 'Lỗi kết nối đến server !',
+                                buttons: {
+                                    tryAgain: {
+                                        text: 'Đóng',
+                                        btnClass: 'btn-red',
+                                        action: function () {
+                                             window.location= _url +"/Login";
+                                        }
+                                    },
+                                }
+                            });
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+
+                console.log(xhr);
+                console.log(textStatus + "\n" + errorThrown);
+            }
+        });
+    }
+</script>

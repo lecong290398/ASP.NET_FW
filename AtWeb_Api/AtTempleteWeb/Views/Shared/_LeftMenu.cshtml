@@ -1,0 +1,30 @@
+﻿@model AtDomain.AtMenuFuntionDm.GetMenuFuntionDmOutput
+
+<ul class="navbar-nav nav-link" data-hover="dropdown">
+    @foreach (var group in Model.listGroup.OrderBy(u => u.SortIndex))
+    {
+        @foreach (var subGroup in Model.listSubGroup.Where(u => u.FK_MenuGroup == group.Id).OrderBy(o => o.SortIndex).ToList())
+        {
+            var lsMenu = Model.listMenu.Where(u => u.FK_MenuSubGroup == subGroup.Id).OrderBy(o => o.SortIndex).ToList();
+            <li class="nav-item dropdown ">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa @subGroup.Icon"></i> @subGroup.SubGroupName
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    @foreach (var menu in lsMenu)
+                    {
+                        if (string.IsNullOrEmpty(menu.RouteId))
+                        {
+                            <a class="dropdown-item" asp-action="@menu.AcctionNameView" asp-controller="@menu.ControllerNameView"><i class="fa @menu.Icon"></i> @menu.Title</a>
+                        }
+                        else
+                        {
+                            <a class="dropdown-item" asp-action="@menu.AcctionNameView" asp-controller="@menu.ControllerNameView" asp-route-id="@menu.RouteId"><i class="fa @menu.Icon"></i> @menu.Title</a>
+                        }
+
+                    }
+                </div>
+            </li>
+        }
+    }
+</ul>

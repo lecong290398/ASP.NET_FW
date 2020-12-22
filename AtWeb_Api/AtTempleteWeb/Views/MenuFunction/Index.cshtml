@@ -1,0 +1,356 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    ViewData["Title"] = "Danh sách chức năng";
+}
+
+<h1>Danh sách chức năng</h1>
+
+@(Html.Kendo().Grid<AtDomain.AtMenuFuntionDm.MenuFunctionDmOutput>()
+    .Name("Grid-MenuFunction")
+    .Columns(columns =>
+    {
+        columns.Command(command =>
+            {
+            command.Custom("Sửa").Text(" ").Click("onEditMenuFunction").IconClass("fa fa-edit").HtmlAttributes(new { style = " color: #218838", title = "Sửa" });
+            }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "MenuFunctions", @atpermissaction = "GetMenuFunctionEdit", @atgridid = "Grid-MenuFunction", @atgridcolindex = "0" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+            columns.Command(command =>
+            {
+            command.Custom("Xóa").Text(" ").Click("onDeleteMenuFunction").IconClass("fa fa-trash").HtmlAttributes(new { style = " color: #FF0000", title = "Xóa" });
+            }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "MenuFunctions", @atpermissaction = "DeleteMenuFunction", @atgridid = "Grid-MenuFunction", @atgridcolindex = "1" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+
+            columns.Command(command =>
+            {
+            command.Custom("DS Role").Text(" ").Click("DanhSachRole").IconClass("fa fa-bars").HtmlAttributes(new { style = " color: #4587F4", title = "DS quyền" });
+            }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "MenuFunctions", @atpermissaction = "GetListRoleMenuFuntion", @atgridid = "Grid-MenuFunction", @atgridcolindex = "2" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+
+            columns.Command(command =>
+            {
+            command.Custom("DS TK").Text(" ").Click("DanhSachTaiKhoan").IconClass("fa fa-users").HtmlAttributes(new { style = " color: #4587F4", title = "DS Tài khoản" });
+            }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "MenuFunctions", @atpermissaction = "GetListAccountMenuFuntion", @atgridid = "Grid-MenuFunction", @atgridcolindex = "3" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+        columns.Bound(p => p.Id).Title("Mã").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.Title).Title("Tiêu đề").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.ControllerName).Title("Tên Controller").Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AcctionName).Title("Tên Acction").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.ControllerNameView).Title("Tên Controller View").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AcctionNameView).Title("Tên Acction View").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.IsMenu).Title("Menu").Width(110).ClientTemplate("<input disabled type='checkbox' #= IsMenu ? checked='checked' :'' # />").HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.IsPublic).Title("Public").Width(110).ClientTemplate("<input disabled type='checkbox' #= IsPublic ? checked='checked' :'' # />").HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.NameMenuSubGroup).Title("Sub Menu").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.NameMenuGroup).Title("Menu Gruop").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.CreateDate).Title("Ngày tạo").ClientTemplate("#= CreateDate ? kendo.toString(kendo.parseDate(CreateDate), 'dd/MM/yyyy') : '' #").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Custom().Text("Tạo mới").IconClass("k-icon k-i-plus").Name("button-create-popup")
+        .HtmlAttributes(new { style = "background-color :#4E73DF; color: white;", @class = "atpermissioncheckrow", @atpermisscontroller = "MenuFunctions", @atpermissaction = "CreateMenuFunction", @atgridid = "Grid-Setting" });
+    })
+     .Events(events => {
+        events.DataBound("onDataBound");
+        events.Page("onPage");
+    })  
+      .Pageable()
+    .Navigatable()
+    .Sortable()
+    .Scrollable()
+    .Filterable()
+    .Selectable(selectable => selectable
+    .Mode(GridSelectionMode.Single)
+    .Type(GridSelectionType.Row)))
+
+
+
+<div class="modal fade bd-example-modal-lg" id="create-menufunction-popup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Tạo mới chức năng</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="from-create-menufunction" class="col-md-12">
+
+                            <div class="form-group">
+                                <label class="control-label">Tiêu đề</label>
+                                <input id="tilte-create" class="form-control k-textbox" name="tilte-create" placeholder="Nhập tiêu dề..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">ControllerName</label>
+                                <input id="controller-name-create" class="form-control k-textbox" name="controller-name-create" placeholder="Nhập ControllerName..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">AcctionName</label>
+                                <input id="acction-name-create" class="form-control k-textbox" name="acction-name-create" placeholder="Nhập AcctionName..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">ControllerNameView</label>
+                                <input id="controller-name-view-create" class="form-control k-textbox" name="controller-name-view-create" placeholder="Nhập ControllerNameView..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">AcctionNameView</label>
+                                <input id="acction-name-viewcode-create" class="form-control k-textbox" name="acction-name-viewcode-create" placeholder="Nhập AcctionNameView..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Note</label>
+                                @Html.TextArea("note-create", new
+                                     {
+                                         @class = "text-wrapp k-textbox",
+                                         style = "width: 100%;    min-height: 100px;"
+                                     })
+
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="control-label">SortIndex</label>
+                                <input id="sort-index-create" class="form-control k-textbox" name="sort-index-create" type="number" min="0"  value="0" required data-max-msg="Enter value between 1 and 10"  />
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Nhóm chức năng</label>
+
+                                @(Html.Kendo().MultiColumnComboBox()
+                                            .Name("MenuFunctionSub-create")
+                                            .DataTextField("SubGroupName")
+                                            .DataValueField("Id")
+                                            .Filter("contains")
+                                            .FilterFields(new string[] { "Code", "Sub Menu","Code Group" ,"Group Menu" })
+                                            .Columns(columns =>
+                                            {
+                                                columns.Add().Field("Id").Title("Code").Width("200px");
+                                                columns.Add().Field("SubGroupName").Title("Sub Menu").Width("200px");
+                                                columns.Add().Field("IdMenuGroup").Title("Code Group").Width("200px");
+                                                columns.Add().Field("MenuGroupName").Title("Group menu").Width("200px");
+                                            })
+                                            .FooterTemplate("Total #: instance.dataSource.total() # items found")
+                                            .HtmlAttributes(new { style = "width:100%;" })
+                                            .Height(400))
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        @(Html.Kendo().CheckBox().Name("IsMenu-create").Checked(false).Label("IsMenu"))
+
+                                    </div>
+                                    <div class="col-6">
+                                        @(Html.Kendo().CheckBox().Name("IsPublic-create").Checked(false).Label("IsPublic"))
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="modal-footer">
+                                <button id="btn-create-menufunction" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="edit-menufunction-popup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="tilte-edit"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="from-edit-menufunction" class="col-md-12">
+                            <input id="id-edit"  hidden="hidden" />
+
+                            <div class="form-group">
+                                <label class="control-label">Tiêu đề</label>
+                                <input id="tilte-edit" class="form-control k-textbox" name="tilte-create" placeholder="Nhập tiêu dề..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">ControllerName</label>
+                                <input id="controller-name-edit" class="form-control k-textbox" name="controller-name-create" placeholder="Nhập ControllerName..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">AcctionName</label>
+                                <input id="acction-name-edit" class="form-control k-textbox" name="acction-name-create" placeholder="Nhập AcctionName..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">ControllerNameView</label>
+                                <input id="controller-name-view-edit" class="form-control k-textbox" name="controller-name-view-create" placeholder="Nhập ControllerNameView..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">AcctionNameView</label>
+                                <input id="acction-name-viewcode-edit" class="form-control k-textbox" name="acction-name-viewcode-create" placeholder="Nhập AcctionNameView..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Note</label>
+                                @Html.TextArea("note-edit", new
+                                     {
+                                         @class = "text-wrapp k-textbox",
+                                         style = "width: 100%;    min-height: 100px;"
+                                     })
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">SortIndex</label>
+                                <input id="sort-index-edit" class="form-control k-textbox" name="sort-index-create" type="number" min="0"  value="0" required data-max-msg="Enter value between 1 and 10" />
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Nhóm chức năng</label>
+
+                                @(Html.Kendo().MultiColumnComboBox()
+                                            .Name("MenuFunctionSub-edit")
+                                            .DataTextField("SubGroupName")
+                                            .DataValueField("Id")
+                                            .Filter("contains")
+                                            .FilterFields(new string[] { "Code", "Sub Menu", "Code Group", "Group Menu" })
+                                            .Columns(columns =>
+                                            {
+                                                columns.Add().Field("Id").Title("Code").Width("200px");
+                                                columns.Add().Field("SubGroupName").Title("Sub Menu").Width("200px");
+                                                columns.Add().Field("IdMenuGroup").Title("Code Group").Width("200px");
+                                                columns.Add().Field("MenuGroupName").Title("Group menu").Width("200px");
+                                            })
+                                            .FooterTemplate("Total #: instance.dataSource.total() # items found")
+                                            .HtmlAttributes(new { style = "width:100%;" })
+                                            .Height(400))
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-6">
+                                        @(Html.Kendo().CheckBox().Name("IsMenu-edit").Checked(false).Label("IsMenu"))
+
+                                    </div>
+                                    <div class="col-6">
+                                        @(Html.Kendo().CheckBox().Name("IsPublic-edit").Checked(false).Label("IsPublic"))
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="modal-footer">
+                                <button id="btn-edit-menufunction" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade bd-example-modal-lg" id="list-role-popup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="tilte-list-role"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @(Html.Kendo().Grid<AtDomain.AtMenuFunction_RoleDm.AtMenuFunction_RoleDm_EditMenuFunction>()
+                                 .Name("Grid-List-Role")
+                                 .Columns(columns =>
+                                 {
+                                     columns.Bound(p => p.Code).Title("Mã").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+                                     columns.Bound(p => p.RoleName).Title("Tên quyền").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+                                 })
+                                 .Pageable(p => p.PageSizes(new int[] { 10, 20, 50, 100, 200, 500, 1000 }).ButtonCount(5))
+                                 .Navigatable()
+                                 .Sortable()
+                                 .Scrollable()
+                                 .Filterable()
+                                 .Selectable(selectable => selectable
+                                 .Mode(GridSelectionMode.Single)
+                                 .Type(GridSelectionType.Row)))
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade bd-example-modal-lg" id="list-account-popup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="tilte-list-account"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @(Html.Kendo().Grid<AtDomain.AtMenuFunction_AccountDm.AtMenuFunction_AccountDmListEditMenuFunction>()
+                                 .Name("Grid-List-Account")
+                                 .Columns(columns =>
+                                 {
+                                     columns.Bound(p => p.Code).Title("Mã").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+                                     columns.Bound(p => p.AccountName).Title("Tên").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+                                 })
+                                 .Pageable(p => p.PageSizes(new int[] { 10, 20, 50, 100, 200, 500, 1000 }).ButtonCount(5))
+                                 .Navigatable()
+                                 .Sortable()
+                                 .Scrollable()
+                                 .Filterable()
+                                 .Selectable(selectable => selectable
+                                 .Mode(GridSelectionMode.Single)
+                                 .Type(GridSelectionType.Row)))
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts {
+
+    <script type="text/javascript">
+            var _atUserToken = '@ViewBag.AtUserToken';
+            var _urlApi = '@(Config["UrlApi"])';
+            var _url = '@(Config["Url"])';
+    </script>
+    <script src="~/js/MenuFunction.js"></script>
+}

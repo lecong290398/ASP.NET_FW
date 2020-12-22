@@ -1,0 +1,181 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    ViewData["Title"] = "Danh sách cấu hình";
+}
+
+<h1>Danh sách cấu hình</h1>
+
+@(Html.Kendo().Grid<AtDomain.AtSettingDm.AtSettingDmListOutput>()
+    .Name("Grid-Setting")
+    .Columns(columns =>
+    {
+            columns.Command(command =>
+            {
+            command.Custom("Sửa").Text(" ").Click("onEditSetting").IconClass("fa fa-edit").HtmlAttributes(new { style = " color: #218838", title = "Sửa" });
+            }).Width(35).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "Settings", @atpermissaction = "Get_EditSetting", @atgridid = "Grid-Setting", @atgridcolindex = "0" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+            columns.Command(command =>
+            {
+            command.Custom("Xóa").Text(" ").Click("onDeleteSetting").IconClass("fa fa-trash").HtmlAttributes(new { style = " color: #FF0000", title = "Xóa" });
+            }).Width(35).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "Settings", @atpermissaction = "DeleteSetting", @atgridid = "Grid-Setting", @atgridcolindex = "1" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+
+        columns.Bound(p => p.Id).Title("Mã").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.NameParentGroup).Title("Tên nhóm").Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.Value).Title("Giá trị").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.Description).Title("Mô tả").Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Custom().Text("Tạo mới").IconClass("k-icon k-i-plus").Name("button-create-popup")
+        .HtmlAttributes(new { style = "background-color :#4E73DF; color: white;", @class = "atpermissioncheckrow", @atpermisscontroller = "Settings", @atpermissaction = "CreateSetting", @atgridid = "Grid-Setting" });
+    })
+     .Events(events => {
+        events.DataBound("onDataBound");
+        events.Page("onPage");
+    }) 
+      .Pageable()
+    .Navigatable()
+    .Sortable()
+    .Scrollable()
+    .Filterable()
+    .Selectable(selectable => selectable
+    .Mode(GridSelectionMode.Single)
+    .Type(GridSelectionType.Row)))
+
+
+<div class="modal fade bd-example-modal-lg" id="setting-popup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title"  >Tạo cấu hình mới</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="from-setting" class="col-md-12" >
+
+                 
+
+                            <div class="form-group">
+                                <label class="control-label">Mã</label>
+                                <input id="code" class="form-control k-textbox" name="code" placeholder="Nhập mã..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Giá trị</label>
+                                <input id="value" class="form-control k-textbox" name="value" placeholder="Nhập tên quyền..." required validationMessage="Vui lòng nhập giá trị !" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="control-label">Mô tả</label>
+                                @Html.TextArea("description", new
+                                   {
+                                       @class = "text-wrapp k-textbox",
+                                       style = "width: 100%;    min-height: 100px;"
+                                   })
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="control-label">Nhóm cấu hình</label>
+
+                                @(Html.Kendo().ComboBox()
+                                 .Name("multiselect-parent")
+                                     .Filter(FilterType.Contains)
+                                     .Placeholder("Chọn nhóm ...")
+                                     .DataTextField("Id")
+                                     .DataValueField("Id")
+                                     .HtmlAttributes(new { style = "width: 100%" })
+                                     )
+                            </div>
+
+                            <div class="modal-footer">
+                                <button id="btn-setting" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="setting-popup-edit" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="tilte-setting" ></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="from-setting-edit" class="col-md-12">
+
+                            <input id="AtRowversion-edit" hidden="hidden" />
+
+                            <div class="form-group">
+                                <label class="control-label">Mã</label>
+                                <input id="code-edit" disabled="disabled" class="form-control k-textbox" name="code" placeholder="Nhập mã..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Giá trị</label>
+                                <input id="value-edit" class="form-control k-textbox" name="name-role" placeholder="Nhập tên quyền..." required validationMessage="Vui lòng nhập giá trị !" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Mô tả</label>
+                                @Html.TextArea("description-edit", new
+                                   {
+                                       @class = "text-wrapp k-textbox",
+                                       style = "width: 100%;    min-height: 100px;"
+                                   })
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Nhóm cấu hình</label>
+
+                                @(Html.Kendo().ComboBox()
+                                 .Name("multiselect-parent-edit")
+                                     .Filter(FilterType.Contains)
+                                     .Placeholder("Chọn nhóm ...")
+                                     .DataTextField("Id")
+                                     .DataValueField("Id")
+                                     .HtmlAttributes(new { style = "width: 100%" })
+                                )
+                            </div>
+
+                            <div class="modal-footer">
+                                <button id="btn-setting-edit" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts {
+
+    <script type="text/javascript">
+            var _atUserToken = '@ViewBag.AtUserToken';
+            var _urlApi = '@(Config["UrlApi"])';
+            var _url = '@(Config["Url"])';
+    </script>
+    <script src="~/js/Setting.js"></script>
+}

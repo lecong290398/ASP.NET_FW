@@ -1,0 +1,1 @@
+﻿Scaffold-DbContext "Server=101.99.32.48,9899;Database=AtTempleteWeb;User Id=sa;Password=1@qweQAZ" Microsoft.EntityFrameworkCore.SqlServer -force -context "AtTempleteWebContext" -ContextDir "Context" -OutputDir "Entires" -UseDatabaseNames

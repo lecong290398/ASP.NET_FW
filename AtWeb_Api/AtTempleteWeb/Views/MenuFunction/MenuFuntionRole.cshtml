@@ -1,0 +1,102 @@
+﻿@model AtDomain.AtMenuFuntionDm.MenuRoleOuput
+@{
+    ViewData["Title"] = "Phân quyền role";
+}
+
+<style>
+    span > i {
+        color: white;
+    }
+
+    span > input {
+        background: none;
+        color: white;
+        padding: 0;
+        border: 0;
+    }
+</style>
+<div class="col-md-12">
+    <h1>Phân quyền ROLE: <span style="color: blue">@Model.NameRole</span> </h1>
+    <form asp-action="MenuFuntionRole" method="post">
+        <div class="form-group">
+
+            <input type="submit" value="Lưu" class="btn btn-primary" />
+            <input type="button" style="margin:0px  5px" onclick="UnCheckAll()" value="Bỏ chọn tất cả" class="btn btn-primary" />
+            <input type="button" onclick="CheckAll()" value="Chọn tất cả" class="btn btn-primary" />
+        </div>
+        <input asp-for="@Model.IdRole" type="hidden" />
+
+        @for (int i = 0; i < Model.ListMenuChucNang.Count(); i++)
+        {
+            <h3 style="color:red">@Model.ListMenuChucNang[i].NameGroup</h3>
+            <input asp-for="@Model.ListMenuChucNang[i].IdMenuGroud" type="hidden" />
+
+            @for (int j = 0; j < @Model.ListMenuChucNang[i].SubFunctions.Count(); j++)
+            {
+                <h4 class="sub-menu">@Model.ListMenuChucNang[i].SubFunctions[j].NameSubName</h4>
+                <input asp-for="@Model.ListMenuChucNang[i].SubFunctions[j].IdSubMenu" type="hidden" />
+                <hr />
+
+                <div class="row row-menu">
+                    @for (int c = 0; c < @Model.ListMenuChucNang[i].SubFunctions[j].MenuFunctions.Count(); c++)
+                    {
+                        <div class="col-sm-3 menuFuntion">
+                            <input type="checkbox" class="check-funtion" asp-for="@Model.ListMenuChucNang[i].SubFunctions[j].MenuFunctions[c].IsCheck" />
+                            <span class="tile-funtion">@Model.ListMenuChucNang[i].SubFunctions[j].MenuFunctions[c].NameMenuFuntion</span>
+                            <input asp-for="@Model.ListMenuChucNang[i].SubFunctions[j].MenuFunctions[c].IdMenuFuntion" type="hidden" />
+                        </div>
+                    }
+                </div>
+            }
+        }
+
+        <div class="modal-footer">
+            <a href="#" onclick="goBack()" style="margin-right: 5px;"><i class="fas fa-undo-alt mr-1"></i>Trở lại</a>
+            <span class="btn btn-primary">
+                <input type="submit" value="Lưu" />
+            </span>
+
+        </div>
+    </form>
+</div>
+<style>
+    .menuFuntion {
+        margin: 15px 10px 15px 20px;
+    }
+
+    .sub-menu {
+        margin-left: 5%;
+        color: #000079;
+        margin-top: 2%;
+    }
+
+    .row-menu {
+        margin-left: 5%;
+    }
+
+    body {
+        color: #212529;
+    }
+
+    span.tile-funtion {
+        margin-left: 5%;
+    }
+
+    .btn-primary {
+        float: right;
+    }
+</style>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function CheckAll() {
+            $(".check-funtion").prop("checked", true);
+        } function UnCheckAll() {
+            $(".check-funtion").prop("checked", false);
+        }
+
+        function goBack() {
+            window.location.href = '/Role';
+        }
+    </script>
+}

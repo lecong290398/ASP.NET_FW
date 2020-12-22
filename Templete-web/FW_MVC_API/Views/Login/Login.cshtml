@@ -1,0 +1,114 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model  FW_MVC_API.Controllers.Login_Input
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Đăng nhập</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--===============================================================================================-->
+    <link rel="icon" type="image/png" href="~/style_login/images/icons/favicon.ico" />
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/vendor/bootstrap/css/bootstrap.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/vendor/animate/animate.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/vendor/css-hamburgers/hamburgers.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/vendor/select2/select2.min.css">
+    <!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="~/style_login/css/util.css">
+    <link rel="stylesheet" type="text/css" href="~/style_login/css/main.css">
+    <!--===============================================================================================-->
+
+
+    <link rel="stylesheet" media="screen" href="~/style/css/style.css">
+</head>
+<body>
+
+    <div class="limiter" id="particles-js">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <div class="login100-pic js-tilt" data-tilt>
+                    <img src="~/style_login/images/img-01.png" alt="IMG">
+                </div>
+
+                <form class="login100-form validate-form" asp-action="Login" method="post">
+
+                    <span class="login100-form-title" style="font-family:Calibri; font-weight:bold ; font-style:italic">
+                        Đăng nhập
+                    </span>
+
+
+                    <div class="wrap-input100 validate-input " data-validate="Chưa nhập Username">
+                        <input class="input100" asp-for="Username" placeholder="Username">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-user" aria-hidden="true"></i>
+                        </span>
+
+                    </div>
+
+                    <div class="wrap-input100 validate-input" data-validate="Chưa nhập Password">
+                        <input asp-for="Password" class="input100" type="password" placeholder="Password">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-lock" aria-hidden="true"></i>
+                        </span>
+                    </div>
+
+                    @if (ViewBag.ShowErros != null)
+                    {
+                        <p class="text-danger" style="font-size: 13px;">@ViewBag.ShowErros</p>
+
+                    }
+
+                    <div class="container-login100-form-btn">
+                        <button type="submit" class="login100-form-btn">
+                            Đăng nhập
+                        </button>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/style/js/particles.js"></script>
+    <script src="~/style/js/app.js"></script>
+
+
+    <!--===============================================================================================-->
+    <script src="~/style_login/vendor/jquery/jquery-3.2.1.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/style_login/vendor/bootstrap/js/popper.js"></script>
+    <script src="~/style_login/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/style_login/vendor/select2/select2.min.js"></script>
+    <!--===============================================================================================-->
+    <script src="~/style_login/vendor/tilt/tilt.jquery.min.js"></script>
+
+    <script src="~/js/SYS001.js"></script>    <script>
+        $('.js-tilt').tilt({
+            scale: 1.1
+        })
+    </script>
+    <!--===============================================================================================-->
+    <script src="~/style_login/js/main.js"></script>
+
+</body>
+</html>
+
+
+<script>
+
+</script>

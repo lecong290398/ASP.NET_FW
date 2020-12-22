@@ -1,0 +1,30 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link href="~/css/style-erros-page.css" rel="stylesheet" />
+</head>
+<body>
+    <!-- partial:index.partial.html -->
+    <div class="noise"></div>
+    <div class="overlay"></div>
+    <div class="terminal">
+        @if (ViewBag.MessagePageEross is AtDomain.AtMessageErros item)
+        {
+            <h1>Error <span class="errorcode">@item.CodeErros</span></h1>
+            <p class="output">@item.Message.</p>
+            <p class="output">Please try to  <a href="@item.Url">return to the homepage</a>.</p>
+            <p class="output">Good luck.</p>
+        }
+
+    </div>
+    <!-- partial -->
+
+</body>
+</html>

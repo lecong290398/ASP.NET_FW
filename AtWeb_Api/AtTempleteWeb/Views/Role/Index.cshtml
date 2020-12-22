@@ -1,0 +1,144 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    ViewData["Title"] = "Danh sách quyền";
+}
+
+<h1>Danh sách quyền</h1>
+
+@(Html.Kendo().Grid<AtDomain.AtRoleDm.AtRoleDmListOutput>()
+    .Name("Grid-Role")
+    .Columns(columns =>
+    {
+        
+         columns.Command(command =>
+            {
+            command.Custom("Sửa").Text(" ").Click("onEditRole").IconClass("fa fa-edit").HtmlAttributes(new { style = " color: #218838", title = "Sửa" });
+            }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "Roles", @atpermissaction = "GetRole", @atgridid = "Grid-Role", @atgridcolindex = "0" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+            columns.Command(command =>
+            {
+            command.Custom("Xóa").Text(" ").Click("onDeleteRole").IconClass("fa fa-trash").HtmlAttributes(new { style = " color: #FF0000", title = "Xóa" });
+            }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "Roles", @atpermissaction = "DeleteRole", @atgridid = "Grid-Role", @atgridcolindex = "1" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+
+            columns.Command(command =>
+            {
+            command.Custom("Phân quyền").Text(" ").Click("onPhanQuyen").IconClass("fa fa-tasks").HtmlAttributes(new { style = " color: #4587F4", title = "Phân quyền" });
+            }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+            , @atpermisscontroller = "MenuFunctions", @atpermissaction = "GetListMenuChucNang_Role", @atgridid = "Grid-Role", @atgridcolindex = "2" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+
+        columns.Bound(p => p.Code).Title("Mã").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.RoleName).Title("Tên quyền").Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.Prioty).Title("Độ ưu tiên").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AtCreatedBy).Title("Người tạo").Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AtCreatedDate).Title("Ngày tạo").ClientTemplate("#= AtCreatedDate ? kendo.toString(kendo.parseDate(AtCreatedDate), 'dd/MM/yyyy') : '' #").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AtLastModifiedBy).Title("Người sửa").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AtLastModifiedDate).Title("Ngày sửa").ClientTemplate("#= AtLastModifiedDate ? kendo.toString(kendo.parseDate(AtLastModifiedDate), 'dd/MM/yyyy') : '' #").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Custom().Text("Tạo mới").IconClass("k-icon k-i-plus").Name("button-create-popup")
+        .HtmlAttributes(new { style = "background-color :#4E73DF; color: white;", @class = "atpermissioncheckrow", @atpermisscontroller = "Roles", @atpermissaction = "CreateRole", @atgridid = "Grid-Setting" });
+    })
+     .Events(events => {
+        events.DataBound("onDataBound");
+        events.Page("onPage");
+    }) 
+      .Pageable()
+    .Navigatable()
+    .Sortable()
+    .Scrollable()
+    .Filterable()
+    .Selectable(selectable => selectable
+    .Mode(GridSelectionMode.Single)
+    .Type(GridSelectionType.Row)))
+
+
+<div class="modal fade bd-example-modal-lg" id="create-role-popup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" >Tạo mới quyền</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="from-create-role" class="col-md-12" >
+
+                            <div class="form-group">
+                                <label class="control-label">Mã</label>
+                                <input id="code-create" class="form-control k-textbox" name="code-create" placeholder="Nhập mã..." required validationMessage="Vui lòng nhập mã !" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Tên quyền</label>
+                                <input id="name-role-create" class="form-control k-textbox" name="name-role-edit" placeholder="Nhập tên quyền..." required validationMessage="Vui lòng nhập tên quyền !" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="control-label">Độ ưu tiên</label>
+                                <input id="prioty-create"  name="prioty-create" class="form-control k-textbox" type="number" min="1" max="10" value="1" required data-max-msg="Enter value between 1 and 10"  placeholder="Nhập dộ ưu tiên..."  />
+                            </div>
+
+                            <div class="modal-footer">
+                                <button id="btn-create-role" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="edit-role-popup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="tilte-edit-Role"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="from-edit-role" class="col-md-12">
+
+                            <div class="form-group">
+                                <label class="control-label">Tên quyền</label>
+                                <input id="name-role-edit"  class="form-control k-textbox" name="name-role-edit" placeholder="Nhập tên quyền..." required validationMessage="Vui lòng nhập tên quyền !" />
+                            </div>
+                            <div class="modal-footer">
+                                <button id="btn-edit-role" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+
+    <script type="text/javascript">
+            var _atUserToken = '@ViewBag.AtUserToken';
+            var _urlApi = '@(Config["UrlApi"])';
+            var _url = '@(Config["Url"])';
+    </script>
+    <script src="~/js/Role.js"></script>
+    
+
+}

@@ -1,0 +1,262 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    ViewData["Title"] = "Danh sách tài khoản";
+}
+
+<h1>Danh sách tài khoản</h1>
+
+
+@(Html.Kendo().Grid<AtDomain.AccountObjectDm.AccountObjectDmListOutput>()
+    .Name("Grid-AccountObject")
+    .Columns(columns =>
+    {
+        columns.Command(command =>
+        {
+            command.Custom("Sửa").Text(" ").Click("onEditAccountObject").IconClass("fa fa-edit").HtmlAttributes(new { style = " color: #218838", title = "Sửa" });
+        }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+        , @atpermisscontroller = "AccountObjects", @atpermissaction = "AccountObject_Edit", @atgridid = "Grid-AccountObject", @atgridcolindex = "0" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+        columns.Command(command =>
+        {
+            command.Custom("Xóa").Text(" ").Click("onDeleteAccount").IconClass("fa fa-trash").HtmlAttributes(new { style = " color: #FF0000", title = "Xóa" });
+        }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+        , @atpermisscontroller = "AccountObjects", @atpermissaction = "AccountObject_Delete", @atgridid = "Grid-AccountObject", @atgridcolindex = "1" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+        columns.Command(command =>
+        {
+            command.Custom("Đổi mật khẩu").Text(" ").Click("resetPassword").IconClass("fa  fa-redo-alt").HtmlAttributes(new { style = " color: #FBBC05", title = "Đổi mật khẩu" });
+        }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+      , @atpermisscontroller = "AccountObjects", @atpermissaction = "AccountObject_ResetPassword", @atgridid = "Grid-AccountObject", @atgridcolindex = "2" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+        columns.Command(command =>
+        {
+            command.Custom("Phân quyền").Text(" ").Click("onPhanQuyen").IconClass("fa fa-tasks").HtmlAttributes(new { style = " color: #4587F4", title = "Phân quyền" });
+        }).Width(55).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; border-left:none;", @class = "atpermissioncheckrow"
+      , @atpermisscontroller = "MenuFunctions", @atpermissaction = "GetListMenuChucNang_Account", @atgridid = "Grid-AccountObject", @atgridcolindex = "3" }).HtmlAttributes(new { style = "border-left:none; padding: 0px 5px 0px 5px;" });
+
+        columns.Bound(p => p.UserName).Title("Tên đăng nhập").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AccountObjectName).Title("Họ tên").Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.Email).Title("Email").Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AtCreatedBy).Title("Người tạo").Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AtCreatedDate).Title("Ngày tạo").ClientTemplate("#= AtCreatedDate ? kendo.toString(kendo.parseDate(AtCreatedDate), 'dd/MM/yyyy') : '' #").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AtLastModifiedBy).Title("Người sửa").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.AtLastModifiedDate).Title("Ngày sửa").ClientTemplate("#= AtLastModifiedDate ? kendo.toString(kendo.parseDate(AtLastModifiedDate), 'dd/MM/yyyy') : '' #").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Custom().Text("Tạo mới").IconClass("k-icon k-i-plus").Name("button-create-popup")
+         .HtmlAttributes(new { style = "background-color :#4E73DF; color: white;", @class = "atpermissioncheckrow", @atpermisscontroller = "AccountObjects", @atpermissaction = "AccountObject_Create", @atgridid = "Grid-Setting" });
+    })
+    .Navigatable()
+    .Sortable()
+    .Scrollable()
+    .Filterable()
+    .Pageable()
+    .Events(events => {
+        events.DataBound("onDataBound");
+        events.Page("onPage");
+    })    
+    .Selectable(selectable => selectable
+    .Mode(GridSelectionMode.Single)
+    .Type(GridSelectionType.Row)))
+
+
+<div class="modal fade bd-example-modal-lg" id="createPopup" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLongTitle" >Tạo mới tài khoản</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="AccountObject" class="col-md-12" >
+
+
+                            <div class="form-group">
+                                <label class="control-label">Họ tên</label>
+                                <input id="accountObjectName" class="form-control k-textbox" name="fullname" placeholder="Nhập họ tên..." required validationMessage="Vui lòng nhập họ tên !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Username</label>
+                                <input id="username"  class="form-control k-textbox" name="username" placeholder="Nhập Username..." required validationMessage="Vui lòng nhập username !" />
+                            </div>
+                            <div class="form-group" id="pass">
+                                <label class="control-label">Password</label>
+                                <input id="password" class="form-control k-textbox" type="password" name="password" placeholder="Nhập password..." required validationMessage="Vui lòng nhập password !" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">SĐT</label>
+                                <input id="phone" pattern="\d{10}" validationMessage="Nhập đúng định dạng SĐT !" type="tel" class="form-control k-textbox" name="phone" placeholder="SĐT... +841387213" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Email</label>
+                                <input id="email" type="email" class="form-control k-textbox" name="email" placeholder="e.g. myname@example.net" data-email-msg="Email không đúng định dạng !" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Vai trò</label>
+
+                                @(Html.Kendo().MultiSelect()
+                                   .Name("multiselect-vai-tro")
+                                   .Placeholder("Chọn vai trò...")
+                                   .AutoClose(true)
+                                   .DataTextField("RoleName")
+                                   .DataValueField("Id")
+                                   .Filter(FilterType.Contains))
+
+                                <span class="k-invalid-msg" data-for="multiselect-vai-tro"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Phòng ban</label>
+
+                                @(Html.Kendo().MultiSelect()
+                                .Name("multiselect-phong-ban")
+                                 .Placeholder("Chọn phòng ban...")
+                                 .AutoClose(true)
+                                 .DataTextField("DepartmentName")
+                                 .DataValueField("Id")
+                                .Filter(FilterType.Contains))
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button id="save-account" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+
+                        </form>
+                      </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="editPopup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLongTitle-edit"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="AccountObject-Edit" class="col-md-12" >
+
+                            <input id="IdAccount-edit"  hidden="hidden" />
+                            <input id="row-version-edit"  hidden="hidden" />
+
+                            <div class="form-group">
+                                <label class="control-label">Họ tên</label>
+                                <input id="accountObjectName-edit" class="form-control k-textbox" name="fullname" placeholder="Nhập họ tên..." required validationMessage="Vui lòng nhập họ tên !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Username</label>
+                                <input id="username-edit" disabled="disabled"  class="form-control k-textbox" name="username" placeholder="Nhập Username..." required validationMessage="Vui lòng nhập username !" />
+                            </div>
+                            
+
+                            <div class="form-group">
+                                <label class="control-label">SĐT</label>
+                                <input id="phone-edit" pattern="\d{10}" validationMessage="Nhập đúng định dạng SĐT !" type="tel" class="form-control k-textbox" name="phone" placeholder="SĐT... +841387213" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Email</label>
+                                <input id="email-edit" type="email" class="form-control k-textbox" name="email" placeholder="e.g. myname@example.net" data-email-msg="Email không đúng định dạng !" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Vai trò</label>
+
+                                @(Html.Kendo().MultiSelect()
+                                   .Name("multiselect-vai-tro-edit")
+                                   .Placeholder("Chọn vai trò...")
+                                   .AutoClose(true)
+                                   .DataTextField("RoleName")
+                                   .DataValueField("Id")
+                                   .Filter(FilterType.Contains))
+
+                                <span class="k-invalid-msg" data-for="multiselect-vai-tro"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Phòng ban</label>
+
+                                @(Html.Kendo().MultiSelect()
+                                .Name("multiselect-phong-ban-edit")
+                                 .Placeholder("Chọn phòng ban...")
+                                 .AutoClose(true)
+                                 .DataTextField("DepartmentName")
+                                 .DataValueField("Id")
+                                .Filter(FilterType.Contains))
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <button id="save-edit-account" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+                        </form>
+                      </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="ResetPasswordPopup" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLongTitle-reset-password"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <form id="from-password-reset" class="col-md-12" >
+
+                            <div class="form-group">
+                                <label class="control-label">Password</label>
+                                <input id="password-reset" type="password" class="form-control k-textbox" name="password-reset" placeholder="Nhập password..." required validationMessage="Vui lòng nhập password !" />
+                            </div>
+                            <div class="modal-footer">
+                                <button id="save-password" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script type="text/javascript">
+            var _atUserToken = '@ViewBag.AtUserToken';
+            var _urlApi = '@(Config["UrlApi"])';
+            var _url = '@(Config["Url"])';
+    </script>
+    <script src="~/js/AccountObject.js"></script>
+}

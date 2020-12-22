@@ -1,0 +1,209 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    ViewData["Title"] = "Thông tin tài khoản";
+}
+
+<h1>Danh sách thông tin</h1>
+
+@(Html.Kendo().Grid<AtDomain.InformationUserDm.InformationUserDmOutput>()
+    .Name("Grid-Information")
+    .Columns(columns =>
+    {
+        columns.Command(command =>
+        {
+            command.Custom("Sửa").Click("onEditInfromation").IconClass("fa fa-edit").HtmlAttributes(new { style = " color: #218838", title = "Sửa" });
+            command.Custom("Xóa").Click("onDeleteInfromation").IconClass("fa fa-trash").HtmlAttributes(new { style = " color: #C82333", title = "Xóa" });
+        }).Width(200).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+
+        columns.Bound(p => p.Id);
+        columns.Bound(p => p.Code).Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.FistName).Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.LastName).Width(180).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.Loai).Width(150).MinScreenWidth(800).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.Kieu).Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.IsInactive).Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.DiemSo).Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.NgaySinh).ClientTemplate("#= NgaySinh ? kendo.toString(kendo.parseDate(NgaySinh), 'dd/MM/yyyy') : '' #").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.CreateBy).Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.CreateDate).Title("Ngày tạo").ClientTemplate("#= CreateDate ? kendo.toString(kendo.parseDate(CreateDate), 'dd/MM/yyyy') : '' #").Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+        columns.Bound(p => p.RowVesion).Width(130).HeaderHtmlAttributes(new { style = "background-color : #8CBFEC; font-weight: bold; text-align: center;" });
+
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Custom().Text("Tạo mới").IconClass("k-icon k-i-plus").Name("button-create-popup").HtmlAttributes(new { style = "background-color : #4E73DF; color: white;" });
+    })
+      .Pageable(p => p.PageSizes(new int[] { 10, 20, 50, 100, 200, 500, 1000 }).ButtonCount(5))
+        .Navigatable()
+        .Sortable()
+        .Filterable()
+        .Scrollable()
+           .Events(events => events
+      
+            .Page("onPaging")
+          
+            )
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .ServerOperation(false)
+        .Events(events => events.Error("error_handler"))
+    )
+)
+
+
+<!-- Large modal -->
+
+<div class="modal fade bd-example-modal-lg" id="createPopup" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title" id="exampleModalLongTitle">Tạo mới thông tin</h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="col">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container">
+                    <div class="row">
+                        <from id="InformationFromCreate"  class="col-md-12"> 
+                            <div class="form-group">
+                                <label class="control-label">Tài khoản</label>
+
+                                @(Html.Kendo().ComboBox()
+                                     .Name("FkAccountObject")
+                                     .DataTextField("UserName")
+                                     .DataValueField("Id")
+                                     .Filter("contains")
+                                     .Placeholder("Chọn tài khoản ...")
+                                     .HtmlAttributes(new { style = "width:100%;" })
+                                )
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Họ</label>
+                                <input id="FistName" class="form-control k-textbox"  name="FistName"  placeholder="Fist name" required validationMessage="Vui lòng nhập Fist name !"/>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Tên</label>
+                                @*<input id="LastName" class="form-control k-textbox" name="LastName" placeholder="Last Name" required validationMessage="Vui lòng nhập Last Name !" />*@
+
+                                @(Html.Kendo().Editor()
+                                  .Name("LastName")
+                                  .HtmlAttributes(new { style = "width: 100%;height:440px" })
+                                
+                                  .Tools(tools => tools
+                                      .Clear()
+                                      .Bold().Italic().Underline().Strikethrough()
+                                      .JustifyLeft().JustifyCenter().JustifyRight().JustifyFull()
+                                      .InsertUnorderedList().InsertOrderedList()
+                                      .Outdent().Indent()
+                                      .CreateLink().Unlink()
+                                      .SubScript()
+                                      .SuperScript()
+                                      .ViewHtml()
+                                      .Formatting()
+                                      .CleanFormatting()
+                                      .FormatPainter()
+                                      .FontName()
+                                      .FontSize()
+                                      .ForeColor().BackColor()
+                                      .Print()
+                                  ))
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Loại tài khoản</label>
+                                @(Html.Kendo().ComboBox()
+                                .Name("StypeAccountObject")
+                                .DataTextField("Name")
+                                .DataValueField("Id")
+                                .Filter("contains")
+                                .Placeholder("Chọn loại...")
+                                .HtmlAttributes(new { style = "width:100%;" })
+                                )
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Kiểu tài khoản</label>
+
+                                @(Html.Kendo().ComboBox()
+                                .Name("TypeAccountObject")
+                                .DataTextField("Name")
+                                .DataValueField("Id")
+                                .Filter("contains")
+                                .Placeholder("Chọn kiểu ...")
+                                .HtmlAttributes(new { style = "width:100%;" })
+                                )
+
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Điểm số</label>
+                                <input type="number" id="DiemSo" name="DiemSo" class="form-control" min="0" max="10" value="1" required data-max-msg="Enter value between 1 and 10" />
+                            </div>
+
+
+
+                            <div class="form-group">
+                                <label class="control-label">Ngày sinh</label>
+
+                                @(Html.Kendo().DatePicker()
+                                 .Name("datepicker")
+                                 .Value(DateTime.Now)
+                                 .HtmlAttributes(new { style = "width: 100%", title = "datepicker" })
+
+                                )
+
+                            </div>
+
+
+                            <div class="form-group">
+                                @(Html.Kendo().Upload()
+                                         .Name("files")
+                                        .Async(a => a
+                                             .Batch(false)
+                                             .Save("Async_Save", "Upload")
+                                             .Remove("Async_Remove", "Upload")
+                                             .AutoUpload(true)
+                                         )
+                                         .Events(events => events
+                                             .Upload("onUpload")
+                                             .Remove("onRemove")
+                                             .Success("onSuccess")
+                                         )
+                                         .Multiple(true)
+                                         .Messages(m => m.Select("Chọn tệp tin"))
+
+                                )
+                            </div>
+
+                            <div class="modal-footer">
+                                <button id="CreateInfromation" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+                                <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                            </div>
+
+                        </from>
+                    </div>
+
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+@section scripts {
+
+        <script type="text/javascript">
+            var _atUserToken = '@ViewBag.AtUserToken';
+            var _urlApi = '@(Config["UrlApi"])';
+            var _url = '@(Config["Url"])';
+        </script>
+        <script src="~/js/InformationAjaxAPI.js"></script>
+}

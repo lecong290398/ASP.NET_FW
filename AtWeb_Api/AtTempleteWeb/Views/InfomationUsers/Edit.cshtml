@@ -1,0 +1,456 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    ViewData["Title"] = "DanhSachInformation_Basic";
+}
+
+<h1>Sửa thông tin tài khoản</h1>
+
+
+<div class="row">
+    <form id="InformationFrom-Edit" class="col-md-12">
+
+        <input id="RowVesion-edit" hidden="hidden" class="form-control" />
+        <input id="id-edit" hidden="hidden" value="@ViewBag.idEdit" class="form-control" />
+        <input id="FkAccountObject-edit" hidden="hidden" class="form-control" />
+
+        <div class="form-group">
+            <label class="control-label">Tài khoản</label>
+            <input id="AccountName-edit" disabled="disabled" class="form-control" />
+
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Họ</label>
+
+            <input id="FistName-edit" class="form-control k-textbox" name="FistName-edit" placeholder="Last Name" required validationMessage="Vui lòng nhập Last Name !" />
+
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Tên</label>
+
+            @*<input id="LastName-edit" class="form-control k-textbox" name="LastName-edit" placeholder="Last Name" required validationMessage="Vui lòng nhập Last Name !" />*@
+
+            @(Html.Kendo().Editor()
+             .Name("LastName-edit")
+             .HtmlAttributes(new { style = "width: 100%;height:440px" })
+
+             .Tools(tools => tools
+                 .Clear()
+                 .Bold().Italic().Underline().Strikethrough()
+                 .JustifyLeft().JustifyCenter().JustifyRight().JustifyFull()
+                 .InsertUnorderedList().InsertOrderedList()
+                 .Outdent().Indent()
+                 .CreateLink().Unlink()
+                 .SubScript()
+                 .SuperScript()
+                 .ViewHtml()
+                 .Formatting()
+                 .CleanFormatting()
+                 .FormatPainter()
+                 .FontName()
+                 .FontSize()
+                 .ForeColor().BackColor()
+                 .Print()
+             ))
+
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Loại tài khoản</label>
+            @(Html.Kendo().ComboBox()
+            .Name("StypeAccountObject-edit")
+            .DataTextField("Name")
+            .DataValueField("Id")
+            .Filter("contains")
+            .Placeholder("Chọn loại...")
+            .HtmlAttributes(new { style = "width:100%;" })
+            )
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Kiểu tài khoản</label>
+
+            @(Html.Kendo().ComboBox()
+            .Name("TypeAccountObject-edit")
+            .DataTextField("Name")
+            .DataValueField("Id")
+            .Filter("contains")
+            .Placeholder("Chọn kiểu ...")
+            .HtmlAttributes(new { style = "width:100%;" })
+            )
+
+        </div>
+
+        <div class="form-group">
+            <label class="control-label">Điểm số</label>
+            <input type="number" id="DiemSo-edit" name="DiemSo-edit" class="form-control" min="0" max="10" value="1" required data-max-msg="Enter value between 1 and 10" />
+
+        </div>
+        <div class="form-group">
+            <label class="control-label">Ngày sinh</label>
+
+            @(Html.Kendo().DatePicker()
+             .Name("datepicker-edit")
+             .Value(DateTime.Now)
+             .HtmlAttributes(new { style = "width: 100%", title = "datepicker" })
+            )
+
+        </div>
+
+
+        <div class="form-group">
+            @(Html.Kendo().Upload()
+                   .Name("files_edit")
+                  .Async(a => a
+                       .Batch(false)
+                       .Save("Async_SaveEdit", "Upload")
+                       .Remove("Async_RemoveEdit", "Upload")
+                       .AutoUpload(true)
+                   )
+                   .Events(events => events
+                       .Upload("onUpload")
+                       .Remove("onRemove")
+                       .Success("onSuccess")
+                   )
+                   .Multiple(true)
+                   .Messages(m => m.Select("Chọn tệp tin"))
+
+            )
+        </div>
+
+        <div id="list-file-upload">
+        </div>
+
+
+        <div class="form-group">
+            <label class="control-label">Ngừng hoạt dộng</label>
+
+            @(Html.Kendo().Switch()
+                 .Name("switchIsInactive-edit")
+                 .Messages(c => c.Checked("ON").Unchecked("OFF"))
+            )
+
+        </div>
+
+        <div class="modal-footer">
+            <button id="Edit-informtionUser" type="submit" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Lưu</button>
+            <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+        </div>
+    </form>
+</div>
+
+
+
+
+@section scripts {
+
+    <script type="text/javascript">
+            var _atUserToken = '@ViewBag.AtUserToken';
+            var _urlApi = '@(Config["UrlApi"])';
+            var _url = '@(Config["Url"])';
+    </script>
+    <script>
+        function onUpload(e) {
+
+            var fileIds = [];
+            for (var i = 0; i < e.files.length; i++) {
+                fileIds.push(e.files[i].uid);
+            }
+
+            //console.log("onUpload");
+            //console.log(fileIds);
+
+            e.data = { fileIds: fileIds };
+        }
+
+        // Truyền thêm id để xóa tên file trên server là GUI_<tenFile>
+        function onRemove(e) {
+
+            var fileIds = [];
+            for (var i = 0; i < e.files.length; i++) {
+                fileIds.push(e.files[i].uid);
+            }
+
+            //console.log("onRemove");
+            //console.log(fileIds);
+
+            e.data = { fileIds: fileIds };
+        }
+
+        // Lưu lại tên file thêm/xóa thành công trên server là GUI_<tenFile>
+        // Dùng để truyền lên API copy file từ web qua
+
+        function onSuccess(e) {
+
+            //console.log("onSuccess");
+            //console.log(e.operation);
+
+
+            if (e.operation === "upload") {
+                for (var i = 0; i < e.files.length; i++) {
+                    listFileId.push(e.files[i].uid);
+                    listFileName.push(e.files[i].name);
+                }
+            }
+            else if (e.operation === "remove") {
+                for (var i = 0; i < e.files.length; i++) {
+
+                    for (var j = 0; j < listFileId.length; j++) {
+                        if (listFileId[j] === e.files[i].uid) {
+                            listFileId.splice(j, 1);
+                            listFileName.splice(j, 1);
+                        }
+                    }
+                }
+            }
+
+            //console.log(listFileId);
+            //console.log(listFileName);
+        }
+
+        $(document).ready(function (e) {
+            var validatorEdit = $("#InformationFrom-Edit").kendoValidator().data("kendoValidator");
+
+            LoadDataEdit(false);
+
+            //Khởi tạo lại dữ liệu
+            listFileId = [];
+            listFileName = [];
+            idInformation = "";
+            listRemoveFileUpload = [];
+            $("#files_edit").data("kendoUpload").clearAllFiles();
+
+
+            CallApiAsynchronous("null", "/api/InfomationUsersAPI/get-information-with-id/?idInformation=" + $('#id-edit').val(), true, "GET", function (keyQuaTraVe) {
+                $("#StypeAccountObject-edit").data("kendoComboBox").value(keyQuaTraVe.Loai);
+                $("#TypeAccountObject-edit").data("kendoComboBox").value(keyQuaTraVe.Kieu);
+                var fistName = $("input#FistName-edit").val(keyQuaTraVe.FistName);
+                //var lastName = $("input#LastName-edit").val(keyQuaTraVe.LastName);
+                var lastName = $("#LastName-edit").data("kendoEditor").value(keyQuaTraVe.LastName);
+
+                var lastName = $("input#AccountName-edit").val(keyQuaTraVe.Fk_AccountObject);
+                var diemSo = $("input#DiemSo-edit").val(keyQuaTraVe.DiemSo);
+                var Id = $("input#id-edit").val(keyQuaTraVe.Id);
+                var Fk_Account = $("input#FkAccountObject-edit").val(keyQuaTraVe.Id);
+                var Rowvesion = $("input#RowVesion-edit").val(keyQuaTraVe.RowVesion);
+                var ngaySinh = $("#datepicker-edit").data("kendoDatePicker").value(keyQuaTraVe.NgaySinh);
+
+                //gán id
+                idInformation = Id;
+                //gen list file đính kèm
+                $(".file-upload").remove();
+                for (var f = 0; f < keyQuaTraVe.ListFileAttchment.length; f++) {
+
+                    $("#list-file-upload").append(
+                        "<div class='row file-upload' id ='"
+                        + keyQuaTraVe.ListFileAttchment[f].AttachmentID
+                        + "'><div class='col-sm-9'><label class='control-label'>"
+                        + keyQuaTraVe.ListFileAttchment[f].FileName
+                        + " </label></div ><div class='col-sm-3'><button  onclick='dowloadfile(this.id)' class='btn btn-brown' id='"
+                        + keyQuaTraVe.ListFileAttchment[f].AttachmentID
+                        + "' ><i class='fas fa-download  mr-1'></i>Tải file</button><button  onclick='deleteFileUpload(this.id)' class='btn btn-brown' id='"
+                        + keyQuaTraVe.ListFileAttchment[f].AttachmentID
+                        + "' ><i class='fas fa-trash-alt mr-1'></i>Xóa file</button></div></div>"
+                    );
+                }
+
+                if (keyQuaTraVe.ListFileAttchment.length == 0) {
+                    $("#list-file-upload").append("");
+                }
+
+            });
+
+            $("#Edit-informtionUser").click(function (event) {
+                event.preventDefault();
+
+                var type = $("#StypeAccountObject-edit").data("kendoComboBox").value();
+                var stype = $("#TypeAccountObject-edit").data("kendoComboBox").value();
+                var fistName = $("input#FistName-edit").val();
+                //var lastName = $("input#LastName-edit").val();
+                var lastName = $("#LastName-edit").data("kendoEditor").value();
+                var diemSo = $("input#DiemSo-edit").val();
+                var ngaySinh = $("#datepicker-edit").data("kendoDatePicker").value();
+                var isInactive = $("#switchIsInactive-edit").data("kendoSwitch").value();
+                var Rowvesion = $("input#RowVesion-edit").val();
+                var Id = $("input#id-edit").val();
+                var Fk_Account = $("input#FkAccountObject-edit").val();
+
+                if (lastName == "" || lastName == null) {
+                    $.confirm({
+                        icon: 'fa fa-spinner fa-spin',
+                        title: 'Thông báo!',
+                        type: 'red',
+                        typeAnimated: true,
+                        content: 'Trường Tên rỗng !',
+                        buttons: {
+                            tryAgain: {
+                                text: 'Đóng',
+                                btnClass: 'btn-red',
+                                action: function () {
+
+                                }
+                            },
+                        }
+                    });
+
+                    return;
+                }
+
+
+                if (type == "" || type == null) {
+
+                    $.confirm({
+                        icon: 'fa fa-spinner fa-spin',
+                        title: 'Thông báo!',
+                        type: 'red',
+                        typeAnimated: true,
+                        content: 'Loại tài khoản rỗng!',
+                        buttons: {
+                            tryAgain: {
+                                text: 'Đóng',
+                                btnClass: 'btn-red',
+                                action: function () {
+
+                                }
+                            },
+                        }
+                    });
+
+                    return;
+
+                }
+                if (stype == "" || stype == null) {
+
+                    $.confirm({
+                        icon: 'fa fa-spinner fa-spin',
+                        title: 'Thông báo!',
+                        type: 'red',
+                        typeAnimated: true,
+                        content: 'Kiểu tài khoản rỗng!',
+                        buttons: {
+                            tryAgain: {
+                                text: 'Đóng',
+                                btnClass: 'btn-red',
+                                action: function () {
+
+                                }
+                            },
+                        }
+                    });
+
+                    return;
+
+                }
+
+                if (validatorEdit.validate()) {
+
+                    var dataInput = {
+                        "FistName": fistName,
+                        "LastName": lastName,
+                        "Kieu": type,
+                        "Loai": stype,
+                        "DiemSo": diemSo,
+                        "NgaySinh": ngaySinh,
+                        "IsInactive": isInactive,
+                        "RowVesion": Rowvesion,
+                        "Id": Id,
+                        "Fk_AccountObject": Fk_Account,
+                        "ListFileRemove": listRemoveFileUpload,
+                        "listFileIds": listFileId,
+                        "listFileNames": listFileName
+                    };
+                    CallApiAsynchronous(dataInput, "/api/InfomationUsersAPI/edit-information-api", false, "POST", function (keyQuaTraVe) {
+                        if (keyQuaTraVe) {
+                            $.confirm({
+                                icon: 'fas fa-check-circle',
+                                title: 'Thông báo',
+                                content: 'Cập nhập thông tin User thành công !',
+                                type: 'green',
+                                typeAnimated: true,
+                                buttons: {
+                                    OK: {
+                                        btnClass: 'btn-green',
+                                        action: function () {
+                                            //load trang đầu tiên
+
+                                            window.location.href = "/InfomationUsers";
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+                else {
+                    $.confirm({
+                        icon: 'fa fa-spinner fa-spin',
+                        title: 'Thông báo!',
+                        type: 'red',
+                        typeAnimated: true,
+                        content: 'Các trường bắt buộc rỗng.  Vui lòng thử lại ',
+                        buttons: {
+                            tryAgain: {
+                                text: 'Đóng',
+                                btnClass: 'btn-red',
+                                action: function () {
+
+                                }
+                            },
+                        }
+                    });
+                }
+            });
+
+        });
+
+
+        function deleteFileUpload(clicked_id) {
+            listRemoveFileUpload.push(clicked_id);
+            $("#" + clicked_id).remove();
+        }
+
+        function dowloadfile(clicked_id) {
+            window.open(_urlApi + "/api/InfomationUsersAPI/tai-file-dinh-kem/?idFile=" + clicked_id);
+        }
+
+
+        function LoadDataEdit(typeCreateOrEdit) {
+
+            //Load cb AccountObject
+            if (typeCreateOrEdit == true) {
+                CallApiAsynchronous("null", "/api/InfomationUsersAPI/load-list-account-object", true, "POST", function (keyQuaTraVe) {
+
+                    var CbAccountObj = $("#FkAccountObject").data("kendoComboBox");
+                    CbAccountObj.setDataSource(keyQuaTraVe);
+
+
+                });
+            }
+
+            //Load CB loại tài khoản
+            CallApiAsynchronous("null", "/api/InfomationUsersAPI/load-list-type", true, "POST", function (keyQuaTraVe) {
+
+                var CbType = $("#TypeAccountObject-edit").data("kendoComboBox");
+                CbType.setDataSource(keyQuaTraVe);
+                CbType.input.attr("readonly", true);
+
+            });
+
+
+            //Load CB kiểu tài khoản
+            CallApiAsynchronous("null", "/api/InfomationUsersAPI/load-list-stype", true, "POST", function (keyQuaTraVe) {
+
+
+                var CbStype = $("#StypeAccountObject-edit").data("kendoComboBox");
+                CbStype.setDataSource(keyQuaTraVe);
+                CbStype.input.attr("readonly", true);
+
+
+
+            });
+        }
+
+    </script>
+}

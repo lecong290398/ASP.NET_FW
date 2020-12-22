@@ -1,0 +1,722 @@
+﻿
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Config
+@{
+    AtTempleteWeb.Helper.SettingServer serverSetting = await AtTempleteWeb.Controllers.SettingController.GetValueSettingApi();
+    var messages = new Dictionary<string, string>() { { "custom", "Please choose another Start Time." } };
+    var rules = new Dictionary<string, string>() { { "custom", "customFunction" } };
+}
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>@ViewData["Title"] - @serverSetting.SYSTEM_TITLE</title>
+    <link href="https://kendo.cdn.telerik.com/2019.2.619/styles/kendo.bootstrap-v4.min.css" rel="stylesheet" type="text/css" />
+
+    <script src="https://kendo.cdn.telerik.com/2019.2.619/js/jquery.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2019.2.619/js/jszip.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2019.2.619/js/kendo.all.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2019.2.619/js/kendo.aspnetmvc.min.js"></script>
+
+
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Condensed&display=swap" rel="stylesheet">
+
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+    <script src="~/lib/jquery-confirm-3.3.2/jquery-confirm.min.js"></script>
+    @RenderSection("css", required: false)
+    <link href="~/lib/jquery-confirm-3.3.2/jquery-confirm.min.css" rel="stylesheet" />
+    <link href="~/lib/fontawesome-free-5.11.2-web/css/all.min.css" rel="stylesheet">
+    <!-- Custom fonts for this template-->
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+    <link href="~/css/layoutDesign.style.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div>
+            <div id="accordion" class="accordion">
+                <div class="card mb-0">
+                    @{
+                        var menuFunctionModel1 = await AtTempleteWeb.Controllers.MenuFunctionController.GetDataMenu();
+                        if (menuFunctionModel1 != null)
+                        {
+                            <partial name="_LeftMenu" model="menuFunctionModel1" />
+                        }
+                        else
+                        {
+                            <script>window.location = "/login"</script>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Use any element to open the sidenav -->
+    <!-- Add all page content inside this div if you want the side nav to push page content to the right (not used if you only want the sidenav to sit on top of the page -->
+    <div id="main">
+        <div class="container-wrapper">
+
+            <div class="header-bar">
+                <div class="logo">
+                    <span id="btn-open-menu-nav-res" style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; </span>
+                    <img src="~/img/kiotvietLogo.png" alt="this is logo" />
+                </div>
+                <div class="list-of-menu-item-header-bar">
+                    <div class="list-of-menu-item-header-bar-left">
+                        <div class="menu-item-header-bar">
+                            <button class="popper-topic menu-item-header-bar" data-toggle="popover" style="background-color: transparent; border: unset;">
+                                <i class="fa fa-paint-brush"></i> Chủ đề
+                            </button>
+                            <div class="popper-topic-content d-none">
+                                <ul class="list-of-color-for-topic">
+                                    <li>
+                                        <div class="color red-color"></div>
+                                    </li>
+                                    <li>
+                                        <div class="color green-color"></div>
+                                    </li>
+                                    <li>
+                                        <div class="color blue-color"></div>
+                                    </li>
+                                    <li>
+                                        <div class="color yellow-color"></div>
+                                    </li>
+                                    <li>
+                                        <div class="color pink-color"></div>
+                                    </li>
+                                    <li>
+                                        <div class="color orange-color"></div>
+                                    </li>
+                                    <li>
+                                        <div class="color gray-color"></div>
+                                    </li>
+                                    <li>
+                                        <div class="color white-color"></div>
+                                    </li>
+                                    <li>
+                                        <div class="color cyan-color"></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="menu-item-header-bar"><i class="fa fa-exclamation-circle"></i> Hỗ trợ</div>
+                        <div class="menu-item-header-bar">
+                            <button class="popper menu-item-header-bar" data-toggle="popover" style="background-color: transparent; border: unset;">
+                                <i class="fa fa-cloud-download"></i> Tải công cụ hỗ trợ
+                            </button>
+                            <div class="popper-content d-none">
+                                <ul class="list-of-tool-to-download">
+                                    <li>
+                                        <i class="fa fa-search"></i> TeamViewer
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-search"></i> UltraViewer
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-search"></i> AnyDesk
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-search"></i> KiotViet chấm công vân tay
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="menu-item-header-bar"><i class="fa fa-print"></i> Tải KiotViet In bar-bếp</div>
+                    </div>
+                    <div class="list-of-menu-item-header-bar-right">
+                        <div class="menu-item-right-header-bar">
+                            @*@(Html.Kendo().DropDownList()
+                                    .Name("ThietLap")
+                                    .DataTextField("Text")
+                                    .DataValueField("Value")
+                                    .BindTo(new List<SelectListItem>() {
+                                    new SelectListItem() {
+                                    Text = "Thiết lập của hàng",
+                                    Value = "1"
+                                    },
+                                    new SelectListItem() {
+                                    Text = "Quản lý mẫu tin",
+                                    Value = "2"
+                                    },
+                                    new SelectListItem() {
+                                    Text = "Quản lý người dùng",
+                                    Value = "3"
+                                    },
+                                     new SelectListItem() {
+                                    Text = "Quản lý người dùng",
+                                    Value = "3"
+                                    },
+                                      new SelectListItem() {
+                                    Text = "Quản lý người dùng",
+                                    Value = "3"
+                                    },
+                                       new SelectListItem() {
+                                    Text = "Quản lý người dùng",
+                                    Value = "3"
+                                    },
+                                    })
+                                    .Value("1")
+                                   .HtmlAttributes(new { style = "width: 100%;   padding: 5px;" })
+                                )*@
+
+
+                        </div>
+                        <div class="menu-item-right-header-bar">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                var ten = User.Identity.Name;
+                                <div class="dropdown show">
+                                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        @ten
+                                    </a>
+
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                        <a class="dropdown-item" href="" id="open-hosocanhan">Hồ sơ</a>
+                                        <a class="dropdown-item" href="" data-toggle="modal" data-target="#logout_Modal">Đăng xuất</a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+                <div class="list-of-menu-item-header-bar-res">
+                    <div class="menu-item-right-header-bar">
+                        <div class="btn-group">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                var ten = User.Identity.Name;
+                                <div class="dropdown show">
+                                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        @ten
+                                    </a>
+
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                        <a class="dropdown-item" href="" id="open-hosocanhan">Hồ sơ</a>
+                                        <a class="dropdown-item" href="" data-toggle="modal" data-target="#logout_Modal">Đăng xuất</a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-branch-res">
+                @*<div class="menu-item-right-header-bar">
+                        <div class="btn-group" style="width: 100%;">
+                            @(Html.Kendo().DropDownList()
+                             .Name("MenuMobile")
+                             .DataTextField("Text")
+                             .DataValueField("Value")
+                             .BindTo(new List<SelectListItem>() {
+                             new SelectListItem() {
+                             Text = "Thiết lập của hàng",
+                             Value = "1"
+                             },
+                             new SelectListItem() {
+                             Text = "Quản lý mẫu tin",
+                             Value = "2"
+                             },
+                             new SelectListItem() {
+                             Text = "Quản lý người dùng",
+                             Value = "3"
+                             },
+                              new SelectListItem() {
+                             Text = "Quản lý người dùng",
+                             Value = "3"
+                             },
+                               new SelectListItem() {
+                             Text = "Quản lý người dùng",
+                             Value = "3"
+                             },
+                                new SelectListItem() {
+                             Text = "Quản lý người dùng",
+                             Value = "3"
+                             },
+                             })
+                             .Value("1")
+                            .HtmlAttributes(new { style = "width: 100%;   padding: 5px;" })
+                            )
+                        </div>
+                    </div>*@
+
+            </div>
+            <div class="nav-menu-bar">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light" style="background-color: #2e94da !important; padding: 0">
+                    <div class="collapse navbar-collapse nav-main-menu-header " id="navbarSupportedContent">
+
+                        @{
+
+                            var menuFunctionModel = await AtTempleteWeb.Controllers.MenuFunctionController.GetDataMenu();
+                            if (menuFunctionModel != null)
+                            {
+                                <partial name="_TopMenu" model="menuFunctionModel" />
+                            }
+                        }
+
+                        <ul class="navbar-nav" data-hover="dropdown">
+                            <li class="nav-item" style="background: #2375b8; padding: 4px 6px; cursor: pointer;">
+                                <a class="nav-link">
+                                    <i class="fa fa-calendar"></i> Nhà bếp
+                                </a>
+                            </li>
+                            <li class="nav-item" style="background-color: #4bac4d; padding: 4px 6px; cursor: pointer;">
+                                <a class="nav-link" href="/list-information-user">
+                                    <i class="fa fa-bell"></i> TEST
+                                </a>
+                            </li>
+                            <li class="nav-item" style="background: #2375b8; padding: 4px 6px; cursor: pointer;">
+                                <a class="nav-link">
+                                    <i class="fa fa-file"></i> Thu ngân
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </nav>
+
+            </div>
+            <div class="main-content-app">
+                <div class="side_bar-wrapper">
+                    <div class="item-filter-sidebar">
+                        <div class="title-item-sidebar">
+                            <span>Tìm kiếm</span>
+                        </div>
+                        <div class="content-item-sidebar">
+                            <input style="width: 100%;" class="input-search-filter form-control" type="text" placeholder="Theo mã đơn hàng">
+                        </div>
+                    </div>
+                    <div class="item-filter-sidebar">
+                        <div id="order-type" class="title-item-sidebar">
+                            <span>Loại thực đơn</span>
+                            <i id="icon-collapse-order-type" class="fa fa-chevron-circle-down icon-collapse-arrow"></i>
+                        </div>
+                        <div id="content-order-type" class="content-item-sidebar">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                <label class="custom-control-label" for="customCheck1">Đồ ăn</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck2">
+                                <label class="custom-control-label" for="customCheck2">Đồ uống</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck3">
+                                <label class="custom-control-label" for="customCheck3">Khác</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-filter-sidebar">
+                        <div id="category-pro" class="title-item-sidebar">
+                            <span>Loại hàng</span>
+                            <i id="icon-collapse-category-pro" class="fa fa-chevron-circle-down icon-collapse-arrow"></i>
+                        </div>
+                        <div id="content-category-pro" class="content-item-sidebar">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheckCategory1">
+                                <label class="custom-control-label" for="customCheckCategory1">Hàng hoá</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheckCategory2">
+                                <label class="custom-control-label" for="customCheckCategory2">Chế biến</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheckCategory3">
+                                <label class="custom-control-label" for="customCheckCategory3">Dịch vụ</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheckCategory4">
+                                <label class="custom-control-label" for="customCheckCategory4">Combo - đóng gói</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-filter-sidebar">
+                        <div id="group-pro" class="title-item-sidebar">
+                            <span>Nhóm hàng</span>
+                            <i id="icon-collapse-group-pro" class="fa fa-chevron-circle-down icon-collapse-arrow"></i>
+                        </div>
+                        <div id="content-group-pro" class="content-item-sidebar">
+                            <div class="input-search-list-type-group">
+                                <div class="form-group has-search input-group" style="margin-bottom: 0;">
+                                    <span class="fa fa-search form-control-feedback"></span>
+                                    <input type="text" class="input-search-filter form-control" placeholder="Tìm kiếm nhóm hàng">
+                                </div>
+                            </div>
+                            <ul class="list-type-group">
+                                <li class="item-group-type">
+                                    <div> Tất cả</div>
+                                    <div class="icon-edit-type-group"><i class="fa fa-pencil"></i></div>
+                                </li>
+                                <li class="item-group-type">
+                                    <div>BIA & THUỐC LÁ</div>
+                                    <div class="icon-edit-type-group"><i class="fa fa-pencil"></i></div>
+                                </li>
+                                <li class="item-group-type">
+                                    <div>CLASSIC COCKTAILS</div>
+                                    <div class="icon-edit-type-group"><i class="fa fa-pencil"></i></div>
+                                </li>
+                                <li class="item-group-type">
+                                    <div>MÓN KHAI VỊ</div>
+                                    <div class="icon-edit-type-group"><i class="fa fa-pencil"></i></div>
+                                </li>
+                                <li class="item-group-type">
+                                    <div>SÚP</div>
+                                    <div class="icon-edit-type-group"><i class="fa fa-pencil"></i></div>
+                                </li>
+                                <li class="item-group-type">
+                                    <div>TEA</div>
+                                    <div class="icon-edit-type-group"><i class="fa fa-pencil"></i></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="item-filter-sidebar">
+                        <div id="inventory-pro" class="title-item-sidebar">
+                            <span>Tồn kho</span>
+                            <i id="icon-collapse-inventory-pro" class="fa fa-chevron-circle-down icon-collapse-arrow"></i>
+                        </div>
+                        <div id="content-inventory-pro" class="content-item-sidebar">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadioInline1">Tất cả</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="customRadioInline2" name="customRadioInline2" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadioInline2">Dưới định mức tồn</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="customRadioInline3" name="customRadioInline3" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadioInline3">Vượt định mức tồn</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="customRadioInline4" name="customRadioInline4" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadioInline4">Còn hàng trong kho</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="customRadioInline5" name="customRadioInline5" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadioInline5">Hết hàng trong kho</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-filter-sidebar">
+                        <div class="title-item-sidebar">
+                            <span>Lựa chọn hiển thị</span>
+                        </div>
+                        <div class="content-item-sidebar">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="customRadioInline6" name="customRadioInline6" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadioInline6">Hàng đang kinh doanh</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="customRadioInline7" name="customRadioInline7" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadioInline7">Hàng ngừng kinh doanh</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="customRadioInline8" name="customRadioInline8" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadioInline8">Tất cả</label>
+                            </div>
+                            <div class="form-inline">
+                                <label for="numberRecord">Số bản ghi: </label>
+                                <input value="15" style="width:100px" type="number" id="numberRecord" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="working_space-wrapper">
+                    @RenderBody()
+                </div>
+
+            </div>
+
+            <div class="footer-app">
+                <span>@serverSetting.FOOTER_COPYRIGHT</span>
+            </div>
+            <button onclick="topFunction()" id="myBtnScrollTop" title="Go to top"><i class="fa fa-angle-up"></i></button>
+        </div>
+    </div>
+
+
+    <div class="modal fade bd-example-modal-lg" id="ho-so-ca-nhan" tabindex="-1" role="dialog" aria-labelledby="Thông tin cá nhân" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="exampleModalLongTitle">Hồ sơ cá nhân</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <form class="col-md-12">
+                                <div class="row form-group">
+                                    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                        <label class="control-label">Họ tên</label>
+                                    </div>
+                                    <div id="detail-fullname" class="col-sm-8 col-md-8 col-lg-8 col-xl-8"></div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                        <label class="control-label">Username</label>
+                                    </div>
+                                    <div id="detail-username" class="col-sm-8 col-md-8 col-lg-8 col-xl-8"></div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                        <label class="control-label">Số điện thoại</label>
+                                    </div>
+                                    <div id="detail-sdt" class="col-sm-8 col-md-8 col-lg-8 col-xl-8"></div>
+                                </div>
+
+                                <div class="row form-group">
+                                    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                        <label class="control-label">Email</label>
+                                    </div>
+                                    <div id="detail-email" class="col-sm-8 col-md-8 col-lg-8 col-xl-8"></div>
+                                </div>
+                                <hr />
+                                <div class="row form-group">
+                                    <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
+                                        <label class="control-label">Mật khẩu</label>
+                                    </div>
+                                    <div class="detail-email col-sm-8 col-md-8 col-lg-8 col-xl-8">******</div>
+                                    <a href="javascript:void(1)" onclick="openViewChangePass()" class="btn-003">Đổi mật khẩu</a>
+                                </div>
+
+
+                                <div class="modal-footer">
+                                    <button id="edit-account" type="button" class="btn btn-primary"><i id="add-save" class="fas fa-save mr-1"></i>Chỉnh sửa</button>
+                                    <button type="button" class="btn btn-brown" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-lg" id="capnhattaikhoan-model" tabindex="-1" role="dialog" aria-labelledby="Đồng ý đề xuất" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="exampleModalLongTitle">Cập nhật tài khoản</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div id="hidden-alert1" style="display:none;">
+                            <div id="alert-zone1">
+                                <ul>
+                                </ul>
+                            </div>
+                        </div>
+                        <form id="hoSoCaNhan-Edit" class="col-md-12" kendo-validator="true" kendo-messages="messages" kendo-rules="rules">
+                            <div class="form-group">
+                                <label class="control-label">Họ và tên</label>
+                                <input id="edit-fullname" name="fullname" class="form-control k-textbox" maxlength="250" required="required" validationMessage="Vui lòng nhập họ tên !" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Số điện thoại</label>
+                                <input id="edit-phone" name="phone" class="form-control k-textbox" pattern="\d{10}" type="tel" required="required" validationMessage="Vui lòng nhập sdt !" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Email</label>
+                                <input id="edit-email" name="email" class="form-control k-textbox" type="email" required="required" validationMessage="Vui lòng nhập email !" />
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" onclick="goback()"><i class="fas fa-undo-alt mr-1"></i>Trở lại</a>
+                    <button type="button" id="save-edit-ho-so" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Lưu</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade bd-example-modal-lg" id="doimatkhau-model" tabindex="-1" role="dialog" aria-labelledby="Đổi mật khẩu" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h6 class="modal-title" id="exampleModalLongTitle">Cập nhật mật khẩu</h6>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <div id="hidden-alert" style="display:none;">
+                        <div id="alert-zone">
+                            <ul>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <form id="from-password-edit" class="col-md-12" kendo-validator="true" kendo-messages="messages" kendo-rules="rules">
+                            <div class="form-group">
+                                <label class="control-label">Nhập mật khẩu cũ</label>
+                                <input id="PasswordOld" name="passold" type="password" class="form-control k-textbox" placeholder="Nhập mật khẩu cũ..." required validationMessage="Vui lòng nhập password" />
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Mật khẩu mới</label>
+                                <input id="PasswordNew" name="passnew" type="password" class="form-control k-textbox" placeholder="Nhập mật khẩu mới..." required validationMessage="Vui lòng nhập mật khẩu mới" />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label">Nhập lại mật khẩu mới</label>
+                                <input id="rePasswordNew" name="repassnew" type="password" class="form-control k-textbox" placeholder="Nhập lại mật khẩu..." required validationMessage="Vui lòng nhập lại mật khẩu mới" />
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a href="#" onclick="goback()"><i class="fas fa-undo-alt mr-1"></i>Trở lại</a>
+                    <button type="button" id="save-edit-password" class="btn btn-primary"><i class="fas fa-save mr-1"></i>Lưu</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fas fa-ban mr-1"></i>Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="div-overlay" class="overlay" style="display:none">
+        <div class="lds-dual-ring"></div>
+    </div>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logout_Modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Đăng xuất</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Bạn muốn đăng xuất khỏi tài khoản?</div>
+                <div class="modal-footer">
+                    <input class="btn btn-primary" value="Đăng xuất" id="btn-logout" type="button" />
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Hủy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/additional-methods.min.js"></script>
+    <script src="~/js/site.js"></script>
+    <script src="~/lib/jquery-dateformat.min.js"></script>
+    <script src="~/js/popper.min.js"></script>
+
+    <script src="~/lib/jquery-confirm-3.3.2/jquery-confirm.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+    <script src="~/js/_LayoutDesign.js"></script>
+    <script src="~/lib/url.min.js"></script>
+    <script src="~/js/HeplerAjax.js"></script>
+    <script src="~/js/MessageErrosHelper.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+<script>
+    var _userId = '@ViewBag.AtUserID';
+    var _url = '@(Config["Url"])';
+    var _atUserToken = '@ViewBag.AtUserToken';
+    var _urlApi = '@(Config["UrlApi"])';
+    var token = window.localStorage.getItem('key_Token');
+
+    $(document).ready(function () {
+
+            console.log("Check All Permission");
+            var listItem = $(".atpermissioncheck");
+             console.log(listItem);
+            if (listItem.length > 0) {
+                // Nếu có item thì mình mới tiến hành gọi API để check permission
+                $.ajax({
+                url: _urlApi + "api/PermissionMenuFunction/get-permission",
+                type: "GET",
+                dataType: 'json',
+                success: function (data) {
+                    if (data.IsOk === true) {
+                        // Lặp danh sách Item trên layout để kiểm tra quyền được phép sử dụng
+                        console.log("ajax OK");
+                        for (var i = 0; i < listItem.length; i++) {
+                            var itemLayout = listItem[i];
+                            var controllerLayout = itemLayout.getAttribute('atpermisscontroller');
+                            var acctionLayout = itemLayout.getAttribute('atpermissaction');
+                            console.log(controllerLayout);
+                            console.log(acctionLayout);
+                            var havePermission = false;
+                            for (var j = 0; j < data.PayLoad.length; j++){
+                                var itemData = data.PayLoad[j];
+                                if (itemData.ControllerNameView == controllerLayout && itemData.AcctionNameView == acctionLayout) {
+                                    // Người dùng có quyền
+                                    havePermission = true;
+                                    break;
+                                }
+                            }
+                            console.log("Check Result");
+                            console.log(havePermission);
+                            if (havePermission == false)
+                            {
+                                // cho display:none
+                                $(itemLayout).css("display", "none");
+                            }
+                        }
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(textStatus + "\n" + errorThrown);
+                }
+            });
+        }
+
+
+
+    });
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+    var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+    (function () {
+        var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+        s1.async = true;
+        s1.src = 'https://embed.tawk.to/5ef40a289e5f694422914125/default';
+        s1.charset = 'UTF-8';
+        s1.setAttribute('crossorigin', '*');
+        s0.parentNode.insertBefore(s1, s0);
+    })();
+</script>
+<!--End of Tawk.to Script-->
